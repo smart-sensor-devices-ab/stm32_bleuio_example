@@ -529,6 +529,7 @@ int main(void)
     MX_USB_HOST_Process();
  8000716:	f00b fadf 	bl	800bcd8 <MX_USB_HOST_Process>
     /* USER CODE BEGIN 3 */
+    // Our own handler for uart input
     handleUartInput(uartStatus);
  800071a:	4b04      	ldr	r3, [pc, #16]	; (800072c <main+0xa4>)
  800071c:	781b      	ldrb	r3, [r3, #0]
@@ -1179,6 +1180,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
  8000b4e:	4b16      	ldr	r3, [pc, #88]	; (8000ba8 <HAL_UART_RxCpltCallback+0x74>)
  8000b50:	22ff      	movs	r2, #255	; 0xff
  8000b52:	701a      	strb	r2, [r3, #0]
+
 		switch(RX_value)
  8000b54:	4b13      	ldr	r3, [pc, #76]	; (8000ba4 <HAL_UART_RxCpltCallback+0x70>)
  8000b56:	681b      	ldr	r3, [r3, #0]
@@ -1229,7 +1231,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *UartHandle)
  8000b88:	bf00      	nop
 			}
 		}
-		HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, RXBUFFERSIZE); // Resets uart recieve interrupt mode
+		// Resets uart recieve interrupt mode
+		HAL_UART_Receive_IT(&huart3, (uint8_t *)aRxBuffer, RXBUFFERSIZE);
  8000b8a:	2201      	movs	r2, #1
  8000b8c:	4904      	ldr	r1, [pc, #16]	; (8000ba0 <HAL_UART_RxCpltCallback+0x6c>)
  8000b8e:	4803      	ldr	r0, [pc, #12]	; (8000b9c <HAL_UART_RxCpltCallback+0x68>)
@@ -29747,6 +29750,7 @@ void USBH_CDC_ReceiveCallback(USBH_HandleTypeDef *phost)
  800bc0c:	4293      	cmp	r3, r2
  800bc0e:	d11c      	bne.n	800bc4a <USBH_CDC_ReceiveCallback+0x4a>
   	{
+  		// handles the data recived from the USB CDC host, we just print it out to UART
   		rx_size = USBH_CDC_GetLastReceivedDataSize(phost);
  800bc10:	6878      	ldr	r0, [r7, #4]
  800bc12:	f7fe fb3e 	bl	800a292 <USBH_CDC_GetLastReceivedDataSize>
@@ -29957,7 +29961,7 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
  800bd4c:	2202      	movs	r2, #2
  800bd4e:	701a      	strb	r2, [r3, #0]
   // Check if BleuIO firmware is running
-  if(phost->device.DevDesc.idProduct == 24578)
+  if(phost->device.DevDesc.idProduct == 0x6002)
  800bd50:	687b      	ldr	r3, [r7, #4]
  800bd52:	f8b3 3330 	ldrh.w	r3, [r3, #816]	; 0x330
  800bd56:	f246 0202 	movw	r2, #24578	; 0x6002

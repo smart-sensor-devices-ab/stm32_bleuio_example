@@ -74,9 +74,11 @@ void USBH_CDC_ReceiveCallback(USBH_HandleTypeDef *phost)
 {
   	if(phost == &hUsbHostFS)
   	{
+  		// Handles the data recived from the USB CDC host, here just printing it out to UART
   		rx_size = USBH_CDC_GetLastReceivedDataSize(phost);
 		HAL_UART_Transmit(&huart3, CDC_RX_Buffer, rx_size, HAL_MAX_DELAY);
 
+		// Reset buffer and restart the callback function to receive more data
 		memset(CDC_RX_Buffer,0,RX_BUFF_SIZE);
 		USBH_CDC_Receive(phost, CDC_RX_Buffer, RX_BUFF_SIZE);
   	}
@@ -90,7 +92,7 @@ void USBH_CDC_ReceiveCallback(USBH_HandleTypeDef *phost)
   */
 void writeToDongle(uint8_t * cmd)
 {
-	USBH_CDC_Transmit (&hUsbHostFS, cmd, strlen((char *)cmd));
+	USBH_CDC_Transmit(&hUsbHostFS, cmd, strlen((char *)cmd));
 }
 /* USER CODE END 1 */
 
@@ -154,7 +156,8 @@ static void USBH_UserProcess  (USBH_HandleTypeDef *phost, uint8_t id)
   case HOST_USER_CLASS_ACTIVE:
   Appli_state = APPLICATION_READY;
   // Check if BleuIO firmware is running
-  if(phost->device.DevDesc.idProduct == 24578)
+  // (idProduct:0x6001 = bootloader, idProduct:0x6002 = bleuio fw)
+  if(phost->device.DevDesc.idProduct == 0x6002)
   {
 	  isBleuIOReady = true;
 	  // Sends message to uart that BleuIO is connected and ready

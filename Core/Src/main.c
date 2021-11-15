@@ -169,6 +169,7 @@ int main(void)
     /* USER CODE END WHILE */
     MX_USB_HOST_Process();
     /* USER CODE BEGIN 3 */
+    // Simple handler for uart input
     handleUartInput(uartStatus);
   }
   /* USER CODE END 3 */
